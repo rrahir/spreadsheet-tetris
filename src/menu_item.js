@@ -1,12 +1,14 @@
+import { CLOCK } from "./constants";
+
 const { topbarMenuRegistry } = o_spreadsheet.registries;
 
 let tetrisSheetId = "";
 
-function registerTetrisControls(env) {
-  window.addEventListener("keydown", (ev) => tetrisControls(ev, env), true);
+function registerTetrisControls(fn) {
+  window.addEventListener("keydown", fn, true);
 }
-function unregisterTetrisControls(env) {
-  window.removeEventListener("keydown", (ev) => tetrisControls(ev, env), true);
+function unregisterTetrisControls(fn) {
+  window.removeEventListener("keydown", fn, true);
 }
 
 function tetrisControls(ev, env) {
@@ -14,17 +16,21 @@ function tetrisControls(ev, env) {
     case "ArrowLeft":
       // Left pressed
       env.model.dispatch("MOVE_TT_LEFT");
+      ev.stopPropagation();
       break;
     case "ArrowRight":
       // Right pressed
       env.model.dispatch("MOVE_TT_RIGHT");
+      ev.stopPropagation();
       break;
     case "ArrowUp":
       // Up pressed
       env.model.dispatch("ROTATE_TT");
+      ev.stopPropagation();
       break;
     case "ArrowDown":
       env.model.dispatch("MOVE_TT_DOWN");
+      ev.stopPropagation();
       break;
     case "space":
       // should drop the tetromino at the lowest possible place
@@ -34,6 +40,8 @@ function tetrisControls(ev, env) {
   }
 }
 
+let timerId = undefined;
+let fn = undefined;
 topbarMenuRegistry
   .add("fun", { name: "Totally Work", sequence: 1000 })
   .addChild("tetris", ["fun"], {
@@ -45,9 +53,16 @@ topbarMenuRegistry
     sequence: 1,
     action: (env) => {
       env.model.dispatch("START_TETRIS");
-      // Add listeners that fucks up pretty much every command
-      // add setInterval taht will check the game is still running.
-      // If not then trigger a "STOP_TETRIS" command
+
+      fn = (ev) => tetrisControls(ev, env);
+      registerTetrisControls(fn);
+      timerId = setInterval(() => {
+        if (!env.model.getters.isTetrisRunning()) {
+          env.model.dispatch("STOP_TETRIS");
+          unregisterTetrisControls(fn);
+          clearInterval(timerId);
+        }
+      }, CLOCK / 2);
     },
     isVisible: (env) => !env.model.getters.isTetrisRunning(),
   })
@@ -56,6 +71,7 @@ topbarMenuRegistry
     sequence: 1,
     action: (env) => {
       env.model.dispatch("STOP_TETRIS");
+      unregisterTetrisControls(fn);
     },
     isVisible: (env) => env.model.getters.isTetrisRunning(),
   });

@@ -62,11 +62,11 @@ const iTetromino = {
 };
 
 export const tetrominos = [
-  oTetromino,
-  jTetromino,
-  lTetromino,
-  tTetromino,
+  // oTetromino,
+  // jTetromino,
+  // lTetromino,
+  // tTetromino,
   sTetromino,
-  zTetromino,
-  iTetromino,
+  // zTetromino,
+  // iTetromino,
 ];
