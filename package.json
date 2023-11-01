@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "@odoo/owl": "2.0.0-beta-18",
-    "bootstrap": "^5.1.3"
+    "bootstrap": "^5.1.3",
+    "@odoo/o-spreadsheet":"17.0.0"
   },
   "devDependencies": {
     "rollup-plugin-minify": "^1.0.3",
