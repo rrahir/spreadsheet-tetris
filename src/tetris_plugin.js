@@ -3,7 +3,7 @@ import { CLOCK, DEFAULT_START_INDEX, EDGE, H, W } from "./constants";
 import { range } from "./helpers";
 import { tetrominos } from "./tetrominos";
 const { UIPlugin } = o_spreadsheet;
-const { uiPluginRegistry } = o_spreadsheet.registries;
+const { featurePluginRegistry } = o_spreadsheet.registries;
 
 function getRandomElement(array) {
   return array[Math.floor(Math.random() * array.length)];
@@ -165,6 +165,7 @@ class TetrisPlugin extends UIPlugin {
       target: [{ left: 0, right: 9, top: 1, bottom: 20 }],
       border: "external",
     });
+    this.score = 0;
     this.grid = new Array(W * H);
     this._newPiece();
 
@@ -280,7 +281,6 @@ class TetrisPlugin extends UIPlugin {
         console.log("GG michel");
 
         counter++;
-        // TODO: add scoring
         setTimeout(() => {
           this.checkLineArray.forEach((index) => (this.grid[index + i * W] = undefined));
           for (let j = i; j >= 1; j--) {
@@ -316,10 +316,6 @@ class TetrisPlugin extends UIPlugin {
       return this.grid[square + this.currentPosition] !== undefined;
     });
     if (lost) {
-      console.log("SADGE");
-      console.log("SADGE");
-      console.log("SADGE");
-      console.log("SADGE");
       this.state = "lost";
       clearInterval(this.timerId);
       return true;
@@ -334,7 +330,7 @@ class TetrisPlugin extends UIPlugin {
     /** check if contact
      * if so then hard code in grid
      * then check if game over
-     * */
+     */
     const contact = this.currentElement.some((square) => {
       const index = square + this.currentPosition;
       return this.grid[index + W] !== undefined || index + W >= W * H;
@@ -414,4 +410,4 @@ class TetrisPlugin extends UIPlugin {
 TetrisPlugin.modes = ["normal"];
 TetrisPlugin.getters = ["isTetrisRunning"];
 
-uiPluginRegistry.add("tetrisPlugin", TetrisPlugin);
+featurePluginRegistry.add("tetrisPlugin", TetrisPlugin);

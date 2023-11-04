@@ -4,22 +4,22 @@
   "description": "dumb tetris",
   "main": "index.js",
   "dependencies": {
-    "@odoo/owl": "2.0.0-beta-18",
-    "bootstrap": "^5.1.3",
-    "@odoo/o-spreadsheet":"17.0.0"
+    "@odoo/o-spreadsheet": "^17.0.2"
   },
   "devDependencies": {
-    "rollup-plugin-minify": "^1.0.3",
     "@rollup/plugin-node-resolve": "^11.0.1",
     "eslint": "^6.8.0",
     "live-server": "^1.2.2",
     "npm": "^8.19.2",
+    "run": "^1.4.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",
     "prettier-plugin-organize-imports": "^3.1.1",
     "rollup": "^2.38.5",
-    "run": "^1.4.0",
-    "serve": "^14.0.1"
+    "rollup-plugin-minify": "^1.0.3",
+    "serve": "^14.0.1",
+    "typescript": "^5.1.6",
+    "@types/node": "^13.13.23"
   },
   "prettier": {
     "printWidth": 100,
@@ -32,7 +32,9 @@
     "serve": "live-server --open=demo --watch=demo,dist/spreadsheet_tetris.js",
     "dev": "npm-run-all bundle --parallel serve watch",
     "bundle": "rollup -c -m",
-    "watch": "npm run bundle -- --watch"
+    "watch": "npm run bundle -- --watch",
+    "build:js": "tsc --module es6 --incremental",
+    "build:bundleJs": "rollup -c -m"
   },
   "author": "",
   "license": "MIT"

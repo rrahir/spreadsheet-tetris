@@ -1,10 +1,10 @@
-(function () {
+(function (oSpreadsheet) {
   'use strict';
 
   var CommandResult = {
-    Success: 0, // should be imported from o-spreadsheet instead of redefined here
-    NoTetrisRunning: 9999,
-    TetrisRunning: 10000,
+    Success: "Success", // should be imported from o-spreadsheet instead of redefined here
+    NoTetrisRunning: "NoTetrisRunning",
+    TetrisRunning: "TetrisRunning",
   };
 
   const W = 10;
@@ -34,7 +34,7 @@
     return array;
   }
 
-  const { topbarMenuRegistry } = o_spreadsheet.registries;
+  const { topbarMenuRegistry } = oSpreadsheet.registries;
 
   function registerTetrisControls(fn) {
     window.addEventListener("keydown", fn, true);
@@ -44,6 +44,7 @@
   }
 
   function tetrisControls(ev, env) {
+    ev.preventDefault();
     switch (ev.key) {
       case "ArrowLeft":
         // Left pressed
@@ -69,6 +70,8 @@
         // can be factorized to make a ghost value
         console.log("not implemented");
         break;
+      case "Escape":
+        env.model.dispatch("STOP_TETRIS");
     }
   }
 
@@ -83,7 +86,7 @@
     .addChild("start", ["fun", "tetris"], {
       name: "Start",
       sequence: 1,
-      action: (env) => {
+      execute: (env) => {
         env.model.dispatch("START_TETRIS");
 
         fn = (ev) => tetrisControls(ev, env);
@@ -101,7 +104,7 @@
     .addChild("tetris", ["fun", "tetris"], {
       name: "Stop",
       sequence: 1,
-      action: (env) => {
+      execute: (env) => {
         env.model.dispatch("STOP_TETRIS");
         unregisterTetrisControls(fn);
       },
@@ -178,7 +181,7 @@
   ];
 
   const { UIPlugin } = o_spreadsheet;
-  const { uiPluginRegistry } = o_spreadsheet.registries;
+  const { featurePluginRegistry } = o_spreadsheet.registries;
 
   function getRandomElement(array) {
     return array[Math.floor(Math.random() * array.length)];
@@ -340,6 +343,7 @@
         target: [{ left: 0, right: 9, top: 1, bottom: 20 }],
         border: "external",
       });
+      this.score = 0;
       this.grid = new Array(W * H);
       this._newPiece();
 
@@ -455,7 +459,6 @@
           console.log("GG michel");
 
           counter++;
-          // TODO: add scoring
           setTimeout(() => {
             this.checkLineArray.forEach((index) => (this.grid[index + i * W] = undefined));
             for (let j = i; j >= 1; j--) {
@@ -491,10 +494,6 @@
         return this.grid[square + this.currentPosition] !== undefined;
       });
       if (lost) {
-        console.log("SADGE");
-        console.log("SADGE");
-        console.log("SADGE");
-        console.log("SADGE");
         this.state = "lost";
         clearInterval(this.timerId);
         return true;
@@ -509,7 +508,7 @@
       /** check if contact
        * if so then hard code in grid
        * then check if game over
-       * */
+       */
       const contact = this.currentElement.some((square) => {
         const index = square + this.currentPosition;
         return this.grid[index + W] !== undefined || index + W >= W * H;
@@ -589,7 +588,7 @@
   TetrisPlugin.modes = ["normal"];
   TetrisPlugin.getters = ["isTetrisRunning"];
 
-  uiPluginRegistry.add("tetrisPlugin", TetrisPlugin);
+  featurePluginRegistry.add("tetrisPlugin", TetrisPlugin);
 
-})();
+})(oSpreadsheet);
 //# sourceMappingURL=spreadsheet_tetris.js.map

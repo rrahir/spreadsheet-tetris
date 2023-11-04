@@ -1,8 +1,8 @@
 import { CLOCK } from "./constants";
 
-const { topbarMenuRegistry } = o_spreadsheet.registries;
+import { registries } from "@odoo/o-spreadsheet";
 
-let tetrisSheetId = "";
+const { topbarMenuRegistry } = registries;
 
 function registerTetrisControls(fn) {
   window.addEventListener("keydown", fn, true);
@@ -11,7 +11,24 @@ function unregisterTetrisControls(fn) {
   window.removeEventListener("keydown", fn, true);
 }
 
+declare module '@odoo/o-spreadsheet' {
+
+  export enum Command {
+    startTetrisCommand
+  }
+}
+// place-to-extend-enum.ts
+import * as p from '@odoo/o-spreadsheet';
+
+export interface startTetrisCommand {
+  type: "START_TETRIS";
+}
+
+
+let a: p.Command = p.Command.startTetrisCommand;
+
 function tetrisControls(ev, env) {
+  ev.preventDefault();
   switch (ev.key) {
     case "ArrowLeft":
       // Left pressed
@@ -37,6 +54,8 @@ function tetrisControls(ev, env) {
       // can be factorized to make a ghost value
       console.log("not implemented");
       break;
+    case "Escape":
+      env.model.dispatch("STOP_TETRIS");
   }
 }
 
@@ -51,7 +70,7 @@ topbarMenuRegistry
   .addChild("start", ["fun", "tetris"], {
     name: "Start",
     sequence: 1,
-    action: (env) => {
+    execute: (env) => {
       env.model.dispatch("START_TETRIS");
 
       fn = (ev) => tetrisControls(ev, env);
@@ -69,7 +88,7 @@ topbarMenuRegistry
   .addChild("tetris", ["fun", "tetris"], {
     name: "Stop",
     sequence: 1,
-    action: (env) => {
+    execute: (env) => {
       env.model.dispatch("STOP_TETRIS");
       unregisterTetrisControls(fn);
     },

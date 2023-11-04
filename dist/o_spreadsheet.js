@@ -33627,6 +33627,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             }
             switch (cmd.type) {
                 case "START":
+                    debugger;
                     const firstSheetId = this.getters.getVisibleSheetIds()[0];
                     this.dispatch("ACTIVATE_SHEET", {
                         sheetIdTo: firstSheetId,
